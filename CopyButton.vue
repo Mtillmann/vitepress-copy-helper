@@ -183,7 +183,7 @@ async function click() {
 
         &::after {
             content: attr(data-label);
-            line-height: 1.2;
+            line-height: 1.3;
         }
     }
 
@@ -194,7 +194,7 @@ async function click() {
         left: 50%;
         color: var(--vp-c-text-1);
         opacity: 0;
-        animation: showmessage 1s ease-out;
+        animation: toast 1s ease-out;
 
         border: 1px solid var(--vp-code-copy-code-border-color);
         border-radius: 4px;
@@ -211,7 +211,7 @@ async function click() {
     }
 }
 
-@keyframes showmessage {
+@keyframes toast {
     0% {
         opacity: 0;
         transform: translate(-50%, -100%);
