@@ -1,6 +1,6 @@
 {
   "name": "vitepress-copy-helper",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "customizable, easy-to-use copy buttons for single-backtick code blocks and general purpose copy helper for vitepress",
   "type": "module",
   "keywords": [
