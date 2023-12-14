@@ -5,6 +5,15 @@
   "main": "index.js",
   "type": "module",
   "keywords": ["vue", "vitepress", "vitepress-plugin", "copy-and-paste", "copy", "helper"],
-  "author": "Martin Tillmann <mtillmann@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "homepage": "https://github.com/Mtillmann/vitepress-copy-helper",
+  "author": "Martin Tillmann<mtillmann@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/Mtillmann/vitepress-copy-helper/issues"
+  },
+  "files": [
+    "src",
+    "scripts",
+    "static"
+  ]
 }
