@@ -12,10 +12,10 @@ export const copyHelperDefaultSettings = defaults;
 </script>
 
 <script setup>
+
 import copyToClipboard from "./copyToClipboard";
 import { ref, onMounted, useSlots } from "vue";
 const slots = useSlots();
-
 
 
 const btn = ref(null);
@@ -50,27 +50,21 @@ const props = defineProps({
     },
 });
 
-
 const labelString = props.label ? props.label : slots.default?.()[0]?.children;
-
 onMounted(() => {
-
-
     const elementBefore = btn.value.previousElementSibling?.tagName === 'CODE' ? btn.value.previousElementSibling : null;
     const elementAfter = btn.value.nextElementSibling?.tagName === 'CODE' ? btn.value.nextElementSibling : null;
 
-    if(!elementBefore && !elementAfter && !props.content){
+    if (!elementBefore && !elementAfter && !props.content) {
         show.value = false;
         return;
     }
 
-
-    if(props.content){
-       return; 
+    if (props.content) {
+        return;
     }
 
-    // attempt inject button into code element
-
+    // attempt to inject button into code element
     let preliminaryPosition = props.position;
     if (props.target === 'auto') {
         if (elementBefore && elementAfter) {
@@ -118,21 +112,27 @@ onMounted(() => {
         insertPosition = 'beforeend';
     }
 
-
     const text = codeElement.value.innerText;
     codeElement.value.innerText = '';
     codeElement.value.insertAdjacentHTML('beforeend', `<span>${text}</span>`);
-
-
-
 
     codeElement.value.insertAdjacentElement(insertPosition, btn.value);
     btn.value.classList.add(`copy-btn-${insertPosition}`);
 });
 
-async function copy() {
-    await copyToClipboard(codeElement.value.querySelector('span').innerText);
+async function click() {
+
+    let text;
+
+    if (codeElement.value) {
+        text = codeElement.value.innerText;
+    } else {
+        text = props.content;
+    }
+
+    await copyToClipboard(text);
     btn.value.classList.add('copied');
+    
     setTimeout(() => {
         btn.value.classList.remove('copied');
     }, 1000);
@@ -140,7 +140,7 @@ async function copy() {
 
 </script>
 <template>
-    <span v-if="show" :class="classes" ref="btn" @click="copy" :data-message="message" :data-label="labelString"></span>
+    <span v-if="show" :class="classes" ref="btn" @click="click" :data-message="message" :data-label="labelString"></span>
 </template>
 <style scoped>
 .copy-btn {
