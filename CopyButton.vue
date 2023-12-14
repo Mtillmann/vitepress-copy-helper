@@ -1,5 +1,5 @@
 <script>
-const defaults = {
+export const defaults = {
     position: 'auto',
     target: 'auto',
     message: 'copied',
@@ -8,7 +8,7 @@ const defaults = {
     preferSibling: 'previous'
 }
 
-export const copyHelperDefaultSettings = defaults;
+
 </script>
 
 <script setup>

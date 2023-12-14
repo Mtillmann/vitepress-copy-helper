@@ -1,5 +1,5 @@
 import CopyButton from './CopyButton.vue';
-import copyHelperDefaultSettings from './CopyButton.vue';
+import defaults from './CopyButton.vue';
 
 export default CopyButton;
-export const copyHelperSettings = copyHelperDefaultSettings;
+export const defaultSettings = defaults;
