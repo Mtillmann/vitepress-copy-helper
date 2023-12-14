@@ -12,15 +12,9 @@ export const copyHelperDefaultSettings = defaults;
 </script>
 
 <script setup>
-
 import copyToClipboard from "./copyToClipboard";
-import { ref, onMounted, useSlots } from "vue";
-const slots = useSlots();
+import { ref, onMounted, useSlots, computed } from "vue";
 
-
-const btn = ref(null);
-const codeElement = ref(null);
-const show = ref(true);
 const props = defineProps({
     position: {
         // start, end, auto
@@ -50,17 +44,34 @@ const props = defineProps({
     },
 });
 
+const slots = useSlots();
+const btn = ref(null);
+const codeNode = ref(null);
+const show = ref(true);
+const error = ref(null);
+const copyContent = ref(null);
 const labelString = props.label ? props.label : slots.default?.()[0]?.children;
+
+const errorComment = computed(() => {
+    return `<!-- Button not rendered: ${error.value} -->`;
+});
+
+const message = computed(() => {
+    return props.message.replace('$CONTENT', copyContent.value);
+});
+
 onMounted(() => {
     const elementBefore = btn.value.previousElementSibling?.tagName === 'CODE' ? btn.value.previousElementSibling : null;
     const elementAfter = btn.value.nextElementSibling?.tagName === 'CODE' ? btn.value.nextElementSibling : null;
 
     if (!elementBefore && !elementAfter && !props.content) {
         show.value = false;
+        error.value = 'No code element found and no content prop given';
         return;
     }
 
     if (props.content) {
+        copyContent.value = props.content;
         return;
     }
 
@@ -69,33 +80,34 @@ onMounted(() => {
     if (props.target === 'auto') {
         if (elementBefore && elementAfter) {
             if (defaults.preferSibling === 'previous') {
-                codeElement.value = elementBefore;
+                codeNode.value = elementBefore;
                 if (preliminaryPosition === 'auto') {
                     preliminaryPosition = 'end';
                 }
             } else if (defaults.preferSibling === 'next') {
-                codeElement.value = elementAfter;
+                codeNode.value = elementAfter;
                 if (preliminaryPosition === 'auto') {
                     preliminaryPosition = 'start';
                 }
             }
         } else {
-            codeElement.value = elementBefore || elementAfter;
+            codeNode.value = elementBefore || elementAfter;
         }
     } else if (props.target === 'previous') {
-        codeElement.value = elementBefore;
+        codeNode.value = elementBefore;
         if (preliminaryPosition === 'auto') {
             preliminaryPosition = 'end';
         }
 
     } else if (props.target === 'next') {
-        codeElement.value = elementAfter;
+        codeNode.value = elementAfter;
         if (preliminaryPosition === 'auto') {
             preliminaryPosition = 'start';
         }
     }
 
-    if (!codeElement.value) {
+    if (!codeNode.value) {
+        error.value = 'Failed to select code node';
         return;
     }
 
@@ -112,27 +124,19 @@ onMounted(() => {
         insertPosition = 'beforeend';
     }
 
-    const text = codeElement.value.innerText;
-    codeElement.value.innerText = '';
-    codeElement.value.insertAdjacentHTML('beforeend', `<span>${text}</span>`);
+    copyContent.value = codeNode.value.innerText;
+    codeNode.value.innerText = '';
+    codeNode.value.insertAdjacentHTML('beforeend', `<span>${copyContent.value}</span>`);
 
-    codeElement.value.insertAdjacentElement(insertPosition, btn.value);
+    codeNode.value.insertAdjacentElement(insertPosition, btn.value);
     btn.value.classList.add(`copy-btn-${insertPosition}`);
 });
 
 async function click() {
 
-    let text;
-
-    if (codeElement.value) {
-        text = codeElement.value.innerText;
-    } else {
-        text = props.content;
-    }
-
-    await copyToClipboard(text);
+    await copyToClipboard(copyContent.value);
     btn.value.classList.add('copied');
-    
+
     setTimeout(() => {
         btn.value.classList.remove('copied');
     }, 1000);
@@ -141,6 +145,7 @@ async function click() {
 </script>
 <template>
     <span v-if="show" :class="classes" ref="btn" @click="click" :data-message="message" :data-label="labelString"></span>
+    <span v-else v-html="errorComment"></span>
 </template>
 <style scoped>
 .copy-btn {
