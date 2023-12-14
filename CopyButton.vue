@@ -3,7 +3,7 @@ const defaults = {
     position: 'auto',
     target: 'auto',
     message: 'copied',
-    label: '',
+    label: null,
     classes: 'copy-btn'
 }
 
@@ -51,6 +51,10 @@ onMounted(() => {
 
     style.value = {
         '--message': props.message
+    }
+
+    if (props.label) {
+        btn.value.classList.add('has-label');
     }
 
     const elementBefore = btn.value.previousElementSibling?.tagName === 'CODE' ? btn.value.previousElementSibling : null;
@@ -104,7 +108,7 @@ async function copy() {
 
 </script>
 <template>
-    <span :class="classes" ref="btn" @click="copy" :data-copied-message="message">{{ label }}</span>
+    <span :class="classes" ref="btn" @click="copy" :data-copied-message="message" :data-label="label"></span>
 </template>
 <style scoped>
 .copy-btn {
@@ -123,6 +127,8 @@ async function copy() {
     background-size: 20px;
     background-repeat: no-repeat;
 
+    line-height: 1;
+
     &.copy-btn-beforeend {
         margin-left: 5px;
     }
@@ -131,7 +137,19 @@ async function copy() {
         margin-right: 5px;
     }
 
-    &.copied::after {
+    &[data-label]{
+        width: auto;
+        padding-left:22px;
+        padding-right: 4px;
+        background-position-x: 2px;
+        padding-top:0;
+        &::after{
+            content: attr(data-label);
+            line-height:1.2;
+        }
+    }
+
+    &.copied::before {
         content: attr(data-copied-message);
         position: absolute;
         top: 0;
@@ -149,6 +167,8 @@ async function copy() {
 
         
         white-space: nowrap;
+
+        line-height: 1;
 
     }
 }
