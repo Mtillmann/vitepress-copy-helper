@@ -14,6 +14,7 @@ In `.vitepress/theme/index.js`:
 
 ```js
 import CopyButton from 'vitepress-copy-helper';
+import 'vitepress-copy-helper/style.css'
 ```
 then, in the `enhanceApp` function, add:
 ```js
@@ -26,6 +27,7 @@ app.component('C', CopyButton),
 To override the default settings, change the import to:
 ```js
 import {default as CopyButton, defaultSettings} from 'vitepress-copy-helper'
+import 'vitepress-copy-helper/style.css'
 ```
 Just change the properties of `defaultSettings` to your liking:
 
@@ -40,4 +42,4 @@ Just change the properties of `defaultSettings` to your liking:
 
 ## Examples
 
-See [here]();
+[Look here for usage examples](https://mtillmann.github.io/posts/simple-copy-button-helper-for-vitepress.html)
