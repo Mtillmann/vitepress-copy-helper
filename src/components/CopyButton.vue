@@ -12,7 +12,7 @@ export const defaults = {
 </script>
 
 <script setup>
-import copyToClipboard from "./copyToClipboard";
+import copyToClipboard from "../copyToClipboard";
 import { ref, onMounted, useSlots, computed } from "vue";
 
 const props = defineProps({
