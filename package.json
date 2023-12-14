@@ -1,10 +1,10 @@
 {
   "name": "vitepress-copy-helper",
   "version": "0.0.1",
-  "description": "customizable copy buttons for single-backtick code blocks and general purpose copy helper for vitepress",
+  "description": "customizable, easy-to-use copy buttons for single-backtick code blocks and general purpose copy helper for vitepress",
   "main": "index.js",
   "type": "module",
-  "keywords": ["vue", "vitepress", "copy-and-paste", "copy", "helper"],
+  "keywords": ["vue", "vitepress", "vitepress-plugin", "copy-and-paste", "copy", "helper"],
   "author": "Martin Tillmann <mtillmann@gmail.com>",
   "license": "MIT"
 }
