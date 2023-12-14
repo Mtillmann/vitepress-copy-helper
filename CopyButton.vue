@@ -4,7 +4,8 @@ const defaults = {
     target: 'auto',
     message: 'copied',
     label: null,
-    classes: 'copy-btn'
+    classes: 'copy-btn',
+    preferSibling: 'previous'
 }
 
 export const copyHelperDefaultSettings = defaults;
@@ -12,14 +13,14 @@ export const copyHelperDefaultSettings = defaults;
 
 <script setup>
 import copyToClipboard from "./copyToClipboard";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, useSlots } from "vue";
+const slots = useSlots();
+
+
 
 const btn = ref(null);
 const codeElement = ref(null);
-const style = ref({})
-let mode = 'code-inline';
-
-
+const show = ref(true);
 const props = defineProps({
     position: {
         // start, end, auto
@@ -27,7 +28,7 @@ const props = defineProps({
         default: () => defaults.position
     },
     target: {
-        // before, after, auto
+        // previous, next, auto
         type: String,
         default: () => defaults.target
     },
@@ -42,30 +43,62 @@ const props = defineProps({
     classes: {
         type: String,
         default: () => defaults.classes
-    }
+    },
+    content: {
+        type: String,
+        default: null
+    },
 });
 
 
+const labelString = props.label ? props.label : slots.default?.()[0]?.children;
 
 onMounted(() => {
 
-    style.value = {
-        '--message': props.message
-    }
-
-    if (props.label) {
-        btn.value.classList.add('has-label');
-    }
 
     const elementBefore = btn.value.previousElementSibling?.tagName === 'CODE' ? btn.value.previousElementSibling : null;
     const elementAfter = btn.value.nextElementSibling?.tagName === 'CODE' ? btn.value.nextElementSibling : null;
 
+    if(!elementBefore && !elementAfter && !props.content){
+        show.value = false;
+        return;
+    }
+
+
+    if(props.content){
+       return; 
+    }
+
+    // attempt inject button into code element
+
+    let preliminaryPosition = props.position;
     if (props.target === 'auto') {
-        codeElement.value = elementBefore || elementAfter;
-    } else if (props.target === 'before') {
+        if (elementBefore && elementAfter) {
+            if (defaults.preferSibling === 'previous') {
+                codeElement.value = elementBefore;
+                if (preliminaryPosition === 'auto') {
+                    preliminaryPosition = 'end';
+                }
+            } else if (defaults.preferSibling === 'next') {
+                codeElement.value = elementAfter;
+                if (preliminaryPosition === 'auto') {
+                    preliminaryPosition = 'start';
+                }
+            }
+        } else {
+            codeElement.value = elementBefore || elementAfter;
+        }
+    } else if (props.target === 'previous') {
         codeElement.value = elementBefore;
-    } else if (props.target === 'after') {
+        if (preliminaryPosition === 'auto') {
+            preliminaryPosition = 'end';
+        }
+
+    } else if (props.target === 'next') {
         codeElement.value = elementAfter;
+        if (preliminaryPosition === 'auto') {
+            preliminaryPosition = 'start';
+        }
     }
 
     if (!codeElement.value) {
@@ -73,19 +106,18 @@ onMounted(() => {
     }
 
     let insertPosition = 'beforeend';
-    if (props.position === 'auto') {
+    if (preliminaryPosition === 'auto') {
         if (elementBefore) {
             insertPosition = 'beforeend';
         } else if (elementAfter) {
             insertPosition = 'afterbegin';
         }
-    } else if (props.position === 'start') {
+    } else if (preliminaryPosition === 'start') {
         insertPosition = 'afterbegin';
-    } else if (props.position === 'end') {
+    } else if (preliminaryPosition === 'end') {
         insertPosition = 'beforeend';
     }
 
-    
 
     const text = codeElement.value.innerText;
     codeElement.value.innerText = '';
@@ -95,7 +127,7 @@ onMounted(() => {
 
 
     codeElement.value.insertAdjacentElement(insertPosition, btn.value);
-    btn.value.classList.add('copy-btn', `copy-btn-${insertPosition}`);
+    btn.value.classList.add(`copy-btn-${insertPosition}`);
 });
 
 async function copy() {
@@ -108,7 +140,7 @@ async function copy() {
 
 </script>
 <template>
-    <span :class="classes" ref="btn" @click="copy" :data-copied-message="message" :data-label="label"></span>
+    <span v-if="show" :class="classes" ref="btn" @click="copy" :data-message="message" :data-label="labelString"></span>
 </template>
 <style scoped>
 .copy-btn {
@@ -137,26 +169,27 @@ async function copy() {
         margin-right: 5px;
     }
 
-    &[data-label]{
+    &[data-label] {
         width: auto;
-        padding-left:22px;
+        padding-left: 22px;
         padding-right: 4px;
         background-position-x: 2px;
-        padding-top:0;
-        &::after{
+        padding-top: 0;
+
+        &::after {
             content: attr(data-label);
-            line-height:1.2;
+            line-height: 1.2;
         }
     }
 
-    &.copied::before {
-        content: attr(data-copied-message);
+    &[data-message].copied::before {
+        content: attr(data-message);
         position: absolute;
         top: 0;
-        left:50%;
-        color:var(--vp-c-text-1);
-        opacity:0;
-        animation: notify 1s ease-out;
+        left: 50%;
+        color: var(--vp-c-text-1);
+        opacity: 0;
+        animation: showmessage 1s ease-out;
 
         border: 1px solid var(--vp-code-copy-code-border-color);
         border-radius: 4px;
@@ -165,7 +198,7 @@ async function copy() {
         display: inline-block;
         background-color: var(--vp-code-copy-code-bg);
 
-        
+
         white-space: nowrap;
 
         line-height: 1;
@@ -173,20 +206,20 @@ async function copy() {
     }
 }
 
-@keyframes notify {
+@keyframes showmessage {
     0% {
         opacity: 0;
-        transform:translate(-50%, -100%);
+        transform: translate(-50%, -100%);
     }
 
     50% {
         opacity: 1;
-        transform:translate(-50%, -150%);
+        transform: translate(-50%, -150%);
     }
 
     100% {
         opacity: 0;
-        transform:translate(-50%, -200%);
+        transform: translate(-50%, -200%);
     }
 }
 </style>
