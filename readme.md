@@ -50,4 +50,4 @@ Just change the properties of `defaultSettings` to your liking:
 
 `copyToClipboard.js` is taken from [vitepress core](https://github.com/vuejs/vitepress/blob/006fd800956de5f12f63980e854239c240a70203/src/client/app/composables/copyCode.ts#L45C1-L87C2). 
 
-Package is based on [@briancbarrow's]([a](https://github.com/briancbarrow)) excellent [boilerplate project](https://github.com/briancbarrow/vue-component-library-2023)!
+Package is based on [@briancbarrow's](https://github.com/briancbarrow) excellent [boilerplate project](https://github.com/briancbarrow/vue-component-library-2023)!
