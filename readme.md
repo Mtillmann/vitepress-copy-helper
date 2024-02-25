@@ -42,7 +42,7 @@ Just change the properties of `defaultSettings` to your liking:
 
 ## Examples
 
-[Look here for usage examples](https://mtillmann.github.io/posts/simple-copy-button-helper-for-vitepress.html)
+[Look here for usage examples](https://mtillmann.blog/posts/simple-copy-button-helper-for-vitepress.html)
 
 ---
 
